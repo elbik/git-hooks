@@ -1,0 +1,25 @@
+#!/usr/local/bin/python3
+
+import sys, re
+from subprocess import check_output
+
+ISSUE_ID = 'HTML-'
+pattern = ISSUE_ID + '(\d*)'
+
+commitMsgFilepath = sys.argv[1]
+
+branchName = check_output(['git', 'symbolic-ref', '--short', 'HEAD']).strip().decode("utf-8")
+
+if branchName.startswith((ISSUE_ID)):
+	prefix = re.match(pattern, branchName)
+	issueId = branchName[prefix.start():prefix.end()]
+
+	commitMsgFile = open(commitMsgFilepath, "r")
+	# print(commitMsgFile.read())
+	content = commitMsgFile.read();
+	commitMsgFile.close()
+
+	commitMsgFile = open(commitMsgFilepath, "w")
+	content = issueId + " " + content
+	commitMsgFile.write(content)
+	commitMsgFile.close()
